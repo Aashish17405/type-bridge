@@ -1,0 +1,58 @@
+{
+  "name": "type-bridge",
+  "version": "0.1.0",
+  "description": "Stop manually syncing types between your backend and frontend. Auto-generate TypeScript types from your ORM schemas.",
+  "main": "src/index.js",
+  "bin": {
+    "type-bridge": "./bin/type-bridge.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.js",
+    "dev": "node bin/type-bridge.js"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "orm",
+    "prisma",
+    "mongoose",
+    "typeorm",
+    "sequelize",
+    "codegen",
+    "type-generation",
+    "backend",
+    "frontend",
+    "sync",
+    "cli"
+  ],
+  "author": "Type-Bridge Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sri11223/type-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sri11223/type-bridge/issues"
+  },
+  "homepage": "https://github.com/sri11223/type-bridge#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chokidar": "^3.5.3",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "prettier": "^3.1.0",
+    "chalk": "^4.1.2",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.54.0",
+    "@types/node": "^20.10.0"
+  }
+}
