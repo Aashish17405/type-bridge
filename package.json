@@ -6,6 +6,13 @@
   "bin": {
     "type-bridge": "./bin/type-bridge.js"
   },
+  "files": [
+    "src/",
+    "bin/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
