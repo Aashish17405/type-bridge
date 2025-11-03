@@ -5,6 +5,16 @@ All notable changes to TypeWeaver will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-11-03
+
+### 🐛 Fixed
+
+- **CLI Branding**: Updated all CLI messages and command names from "type-bridge" to "typeweaver" to match package name
+  - Changed program name in help text
+  - Updated setup wizard messages  
+  - Updated watch mode banner
+  - Config filename remains `type-bridge.config.json` for backwards compatibility
+
 ## [1.1.1] - 2025-11-03
 
 ### 🐛 Fixed - Mongoose Support
