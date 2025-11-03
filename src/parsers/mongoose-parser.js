@@ -66,6 +66,15 @@ function extractFieldType(fieldDef) {
   if (fieldDef && typeof fieldDef === 'object' && fieldDef.type) {
     const typeInfo = extractFieldType(fieldDef.type);
     
+    // Check for enum (e.g., { type: String, enum: ['value1', 'value2'] })
+    if (fieldDef.enum) {
+      return {
+        ...typeInfo,
+        isEnum: true,
+        enumValues: fieldDef.enum
+      };
+    }
+    
     // Check for ref (relationship)
     if (fieldDef.ref) {
       return {
@@ -78,7 +87,7 @@ function extractFieldType(fieldDef) {
     return typeInfo;
   }
 
-  // Handle enum
+  // Handle enum without explicit type: { enum: ['value1', 'value2'] }
   if (fieldDef && typeof fieldDef === 'object' && fieldDef.enum) {
     return {
       type: STANDARD_TYPES.STRING,
@@ -172,9 +181,9 @@ function parseSchemaFields(schemaObj, schemaPaths = {}) {
 }
 
 /**
- * Extract schema from require'd module
+ * Extract schema(s) from require'd module
  * @param {string} filePath - Path to model file
- * @returns {Object|null} Schema object or null
+ * @returns {Object[]|null} Array of schema objects or null
  */
 function extractSchemaFromFile(filePath) {
   try {
@@ -184,13 +193,41 @@ function extractSchemaFromFile(filePath) {
     // Try to require the file
     const module = require(filePath);
     
-    // Try different export patterns
+    const results = [];
+    
+    // Check if module exports multiple models (e.g., { User: Model, Product: Model })
+    if (module && typeof module === 'object') {
+      for (const [key, exp] of Object.entries(module)) {
+        if (!exp) continue;
+        
+        // Check if it's a Mongoose model
+        if (exp.schema && exp.modelName) {
+          results.push({
+            modelName: exp.modelName,
+            schema: exp.schema
+          });
+        }
+        // Check if it's a schema directly
+        else if (exp.obj && exp.paths) {
+          results.push({
+            modelName: key,
+            schema: exp
+          });
+        }
+      }
+    }
+    
+    // If we found models, return them
+    if (results.length > 0) {
+      return results;
+    }
+    
+    // Fallback: check for single default export
     const possibleExports = [
       module,
       module.default,
       module.model,
-      module.schema,
-      ...Object.values(module)
+      module.schema
     ];
 
     for (const exp of possibleExports) {
@@ -198,20 +235,20 @@ function extractSchemaFromFile(filePath) {
 
       // Check if it's a Mongoose model
       if (exp.schema && exp.modelName) {
-        return {
+        return [{
           modelName: exp.modelName,
           schema: exp.schema
-        };
+        }];
       }
 
       // Check if it's a schema directly
       if (exp.obj && exp.paths) {
         // Try to extract model name from file name
         const modelName = path.basename(filePath, path.extname(filePath));
-        return {
+        return [{
           modelName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
           schema: exp
-        };
+        }];
       }
     }
 
@@ -225,20 +262,21 @@ function extractSchemaFromFile(filePath) {
 /**
  * Parse Mongoose model file
  * @param {string} filePath - Path to model file
- * @returns {Object|null} Normalized model or null
+ * @returns {Object[]|null} Array of normalized models or null
  */
 function parseMongooseModel(filePath) {
   const extracted = extractSchemaFromFile(filePath);
-  if (!extracted) return null;
+  if (!extracted || extracted.length === 0) return null;
 
-  const { modelName, schema } = extracted;
-  const fields = parseSchemaFields(schema.obj, schema.paths);
-
-  return normalizeModel({
-    modelName,
-    fields,
-    source: 'mongoose',
-    filePath
+  // Map each extracted schema to a normalized model
+  return extracted.map(({ modelName, schema }) => {
+    const fields = parseSchemaFields(schema.obj, schema.paths);
+    return normalizeModel({
+      modelName,
+      fields,
+      source: 'mongoose',
+      filePath
+    });
   });
 }
 
@@ -278,9 +316,10 @@ async function parseMongooseModels(directory, options = {}) {
   const models = [];
 
   for (const file of files) {
-    const model = parseMongooseModel(file);
-    if (model) {
-      models.push(model);
+    const parsedModels = parseMongooseModel(file);
+    if (parsedModels) {
+      // parseMongooseModel now returns an array of models
+      models.push(...parsedModels);
     }
   }
 

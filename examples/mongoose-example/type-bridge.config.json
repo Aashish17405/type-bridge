@@ -1,0 +1,8 @@
+{
+  "orm": "mongoose",
+  "modelsPath": "./",
+  "outputPath": "./types",
+  "outputMode": "separate",
+  "includeComments": true,
+  "backup": true
+}

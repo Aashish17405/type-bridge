@@ -44,3 +44,8 @@ temp/
 # Test files
 test-output/
 *.test.output
+
+# Examples - ignore generated files and dependencies
+examples/*/node_modules/
+examples/*/types/
+examples/*/generated-types/

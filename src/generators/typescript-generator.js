@@ -114,7 +114,7 @@ function collectTypeDependencies(model, allEnums = []) {
   const enumNames = new Set(allEnums.map(e => e.name));
   
   // Primitive types that don't need imports
-  const primitives = new Set(['string', 'number', 'boolean', 'Date', 'any', 'unknown', 'void', 'null', 'undefined', 'array']);
+  const primitives = new Set(['string', 'number', 'boolean', 'Date', 'any', 'unknown', 'void', 'null', 'undefined', 'array', 'object']);
 
   model.fields.forEach(field => {
     // For arrays, check arrayOf instead of type
